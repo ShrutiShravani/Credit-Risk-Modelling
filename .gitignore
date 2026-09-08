@@ -1,0 +1,11 @@
+# Ignore heavy pipeline outputs
+artifacts/
+artifact/
+*.npy
+*.pkl
+*.csv
+catboost_info/
+__pycache__/
+.pytest_cache/
+data/
+logs/
