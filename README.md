@@ -6,7 +6,7 @@ and **Exposure at Default (EAD)**, then combining them into **Expected Loss**
 to compare risk-based capital provisioning against a naive flat-rate baseline —
 the same PD/LGD/EAD framework banks use under IFRS9 / Ind AS 109.
  
-**Live dashboard:** _[add your Streamlit Cloud link here]_
+**Live dashboard:** https://credit-risk-modelling-fxpxy3dveno8br9dfqcuvr.streamlit.app/
  
 ---
  
