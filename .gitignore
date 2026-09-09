@@ -1,6 +1,4 @@
 # Ignore heavy pipeline outputs
-artifacts/
-artifact/
 *.npy
 *.pkl
 *.csv

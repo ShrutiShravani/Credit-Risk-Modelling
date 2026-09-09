@@ -3,6 +3,7 @@ from src.utils.main_utils import load_object, load_numpy_array_data
 import json
 from  src.entity.artifact_entity  import DataTransformationArtifact,ModelTrainerArtifact
 import pandas as pd
+from src.logger import logging
 
 def calculate_expected_loss(model_trainer_artifact: ModelTrainerArtifact,
     data_transformation_artifact: DataTransformationArtifact,):
@@ -19,6 +20,27 @@ def calculate_expected_loss(model_trainer_artifact: ModelTrainerArtifact,
     X_test_full = load_numpy_array_data(data_transformation_artifact.transformed_full_test_features_file_path)
     lgd_pred = np.clip(lgd_model.predict(X_test_full), 0, 1)
     ead_pred = np.clip(ead_model.predict(X_test_full), 0, None)
+
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    print("LGD pred stats:\n", pd.Series(lgd_pred).describe())
+    print("EAD pred stats:\n", pd.Series(ead_pred).describe())
+
+    pd.Series(lgd_pred).hist(bins=30)
+    plt.title("LGD predictions on full test set")
+    plt.savefig("artifacts/lgd_pred_histogram.png")   # save instead of show(), since this runs as a script not notebook
+    plt.close()
+
+    pd.Series(ead_pred).hist(bins=30)
+    plt.title("EAD predictions on full test set")
+    plt.savefig("artifacts/ead_pred_histogram.png")
+    plt.close()
+
+    logging.info(f"PD pred stats:{pd.Series(pd_pred).describe()}")
+    logging.info(f"LGD pred stats: {pd.Series(lgd_pred).describe()}")
+    logging.info(f"EAD pred stats:{pd.Series(ead_pred).describe()}")
+    logging.info(f"X_test_full shape:{X_test_full.shape}")
 
     expected_loss_per_loan = pd_pred * lgd_pred * ead_pred
 

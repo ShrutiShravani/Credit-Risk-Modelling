@@ -30,7 +30,7 @@ class DataIngestion:
               collection_name=self.data_ingestion_config.collection_name
           )
 
-          raw_data_file_path = r"C:\Users\AdmiN\Desktop\Credit_Risk_Modelling\data\loan_data.csv"
+          raw_data_file_path = r"data/loan_data.csv"
           logging.info(f"Reading raw CSV dataset from: {raw_data_file_path}")
 
           # Read raw CSV using selected columns to reduce memory overhead
@@ -49,7 +49,7 @@ class DataIngestion:
               " local raw CSV."
           )
 
-          raw_csv_path = r"C:\Users\AdmiN\Desktop\Credit_Risk_Modelling\data\loan_data.csv"
+          raw_csv_path = r"data/loan_data.csv"
 
           if not os.path.exists(raw_csv_path):
             raise FileNotFoundError(

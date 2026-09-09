@@ -1,11 +1,11 @@
 import os, sys
-import math
 import numpy as np
 import mlflow
 import mlflow.sklearn
 import mlflow.xgboost
 from xgboost import XGBClassifier, XGBRegressor
 from sklearn.linear_model import LogisticRegression
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import roc_auc_score, mean_squared_error
 from src.exception import CustomException
 from src.logger import logging
@@ -49,33 +49,44 @@ class ModelTrainer:
             logging.info(f"Logistic Regression AUC: {log_reg_auc:.4f} | XGBoost AUC: {xgb_auc:.4f}")
 
             if xgb_auc >= log_reg_auc:
-                best_model, best_auc, best_name = xgb_model, xgb_auc, "XGBClassifier"
+                raw_model, raw_auc, best_name = xgb_model, xgb_auc, "XGBClassifier"
             else:
-                best_model, best_auc, best_name = log_reg, log_reg_auc, "LogisticRegression"
+                raw_model, raw_auc, best_name = log_reg, log_reg_auc, "LogisticRegression"
 
-            gini = 2 * best_auc - 1
+            # ---- CALIBRATE against the REAL (unbalanced) test distribution ----
+            calibrated_model = CalibratedClassifierCV(raw_model, method='sigmoid', cv='prefit')
+            calibrated_model.fit(X_test, y_test)
+
+            calibrated_pred = calibrated_model.predict_proba(X_test)[:, 1]
+            calibrated_auc = roc_auc_score(y_test, calibrated_pred)
+
+            logging.info(f"Predicted mean PD before calibration: {raw_model.predict_proba(X_test)[:, 1].mean():.4f}")
+            logging.info(f"Predicted mean PD after calibration: {calibrated_pred.mean():.4f}")
+            logging.info(f"Actual default rate in test: {y_test.mean():.4f}")
+
+            gini = 2 * calibrated_auc - 1
 
             mlflow.log_param("selected_model", best_name)
             mlflow.log_param("n_estimators", 200)
             mlflow.log_param("max_depth", 4)
             mlflow.log_param("learning_rate", 0.05)
-            mlflow.log_metric("selected_auc", best_auc)
+            mlflow.log_metric("selected_auc", calibrated_auc)
             mlflow.log_metric("gini", gini)
+            mlflow.sklearn.log_model(calibrated_model, "model",skops_trusted_types=[
+        "sklearn.calibration._CalibratedClassifier",
+        "sklearn.calibration._SigmoidCalibration"
+    ])
 
-            if best_name == "XGBClassifier":
-                mlflow.xgboost.log_model(best_model, "model")
-            else:
-                mlflow.sklearn.log_model(best_model, "model")
 
-            if best_auc < self.model_trainer_config.expected_pd_auc:
+            if calibrated_auc < self.model_trainer_config.expected_pd_auc:
                 mlflow.log_param("status", "FAILED_THRESHOLD")
-                raise Exception(f"PD model AUC {best_auc:.4f} below acceptable threshold "
+                raise Exception(f"PD model AUC {calibrated_auc:.4f} below acceptable threshold "
                                  f"{self.model_trainer_config.expected_pd_auc}")
 
             mlflow.log_param("status", "PASSED")
-            save_object(self.model_trainer_config.pd_model_file_path, best_model)
+            save_object(self.model_trainer_config.pd_model_file_path, calibrated_model)
 
-        return best_model, best_auc, gini
+        return calibrated_model, calibrated_auc, gini
 
     # ---------- LGD model ----------
     def train_lgd_model(self):

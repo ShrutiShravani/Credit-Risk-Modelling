@@ -1,0 +1,9 @@
+{
+  "pd_auc": 0.7208377208623626,
+  "lgd_rmse": 0.18458401511287906,
+  "ead_rmse": 3040.0779236295225,
+  "total_expected_loss": 196816641.237284,
+  "naive_reserve": 89198001.25,
+  "risk_adjusted_reserve": 196816641.237284,
+  "efficiency_gain_pct": -120.65140303498
+}

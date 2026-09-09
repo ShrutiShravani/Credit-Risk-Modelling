@@ -1,0 +1,23 @@
+artifact_path: /Users/shivangi/Downloads/Credit_Risk_Modelling/mlruns/1/models/m-4fa58de21d3e490681e491087e49815e/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.skops
+    predict_fn: predict
+    python_version: 3.10.21
+  sklearn:
+    code: null
+    pickled_model: model.skops
+    serialization_format: skops
+    sklearn_version: 1.7.2
+    skops_trusted_types: null
+mlflow_version: 3.16.0
+model_id: m-4fa58de21d3e490681e491087e49815e
+model_size_bytes: 9378
+model_uuid: m-4fa58de21d3e490681e491087e49815e
+prompts: null
+run_id: 5a290343c4b847a5a65c6eec2658252a
+utc_time_created: '2026-09-09 06:52:13.709721'

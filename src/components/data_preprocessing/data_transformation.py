@@ -151,6 +151,9 @@ class DataTransformation:
         full_test_cat= encoder.transform(test_df[cat_cols])
         full_test_X = np.c_[full_test_num, full_test_cat]
 
+        logging.info(f"train_X shape (what LGD/EAD models were trained on):{train_X.shape}")
+        logging.info(f"full_test_X shape (what we're using for portfolio EL):{full_test_X.shape}")
+
         lgd_train_arr = np.c_[train_X, train_def['lgd'].values]
         lgd_test_arr = np.c_[test_X, test_def['lgd'].values]
         ead_train_arr = np.c_[train_X, train_def['ead'].values]
@@ -216,6 +219,11 @@ class DataTransformation:
             train_clean = self.feature_engineering(train_clean)
             test_clean = self.feature_engineering(test_clean)
             logging.info("fe_done")
+
+            test_clean.sample(min(5000, len(test_clean)), random_state=42).to_parquet(
+                "artifacts/cleaned_loans_sample.parquet", index=False
+            )
+
 
 
             train_null_counts = train_clean.isna().sum()

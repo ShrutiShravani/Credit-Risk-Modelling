@@ -1,0 +1,22 @@
+artifact_path: /Users/shivangi/Downloads/Credit_Risk_Modelling/mlruns/1/models/m-dd440458ab2e4177af66933ae26f6c60/artifacts
+flavors:
+  python_function:
+    data: model.ubj
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.10.21
+  xgboost:
+    code: null
+    data: model.ubj
+    model_class: xgboost.sklearn.XGBRegressor
+    model_format: ubj
+    xgb_version: 3.2.0
+mlflow_version: 3.16.0
+model_id: m-dd440458ab2e4177af66933ae26f6c60
+model_size_bytes: 339564
+model_uuid: m-dd440458ab2e4177af66933ae26f6c60
+prompts: null
+run_id: f265ba1a6eb948848ca45a9f3c8e1c71
+utc_time_created: '2026-09-09 07:18:47.322562'
